@@ -12,3 +12,5 @@ plt.triplot(points[:,0], points[:,1], tri.simplices)
 plt.plot(points[:,0], points[:,1], 'o')
 
 plt.show()
+
+#HOLA MUNDO
