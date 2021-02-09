@@ -17,8 +17,7 @@ class main:
         environ["QT_SCALE_FACTOR"] = "1"
 
     def mostrar(self):
-        if __name__ == "__main__":
-            self.suppress_qt_warnings()
+        self.suppress_qt_warnings()
         img = cv2.imread(self.img)  # Lee la imagen
         X = self.pointsX
         Y = self.pointsY
@@ -34,6 +33,7 @@ class main:
 
         self.mostrar()
 
-img = "face.jpg"
-principal = main(img)
-principal.unir()
+if __name__ == '__main__':
+    img = "face.jpg"
+    principal = main(img)
+    principal.unir()
