@@ -1,6 +1,5 @@
 import cv2
 import dlib
-from os import environ
 
 class PuntosFaciales:
 

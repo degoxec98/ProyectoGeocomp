@@ -1,6 +1,9 @@
 import cv2
 import dlib
 from os import environ
+from scipy.spatial import Delaunay
+import numpy as np
+import matplotlib.pyplot as plt
 
 def suppress_qt_warnings():
     environ["QT_DEVICE_PIXEL_RATIO"] = "0"
@@ -12,13 +15,6 @@ if __name__ == "__main__":
     suppress_qt_warnings()
 
 
-"""
-import export
-export QT_DEVICE_PIXEL_RATIO=0
-export QT_AUTO_SCREEN_SCALE_FACTOR=1
-export QT_SCREEN_SCALE_FACTORS=1
-export QT_SCALE_FACTOR=1
-"""
 
 pointsX = []
 pointsY = []
@@ -58,4 +54,20 @@ cv2.imshow(winname="Face", mat=img) #Muestra la imagen
 cv2.waitKey(delay=0) #Espera para salir
 
 cv2.destroyAllWindows() #Cierra todas las ventanas
+
+#--------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------
+
+
+points = np.array([[0, 0], [0, 1.1], [1, 0], [1, 1]])
+
+
+tri = Delaunay(points)
+
+plt.triplot(points[:,0], points[:,1], tri.simplices)
+
+plt.plot(points[:,0], points[:,1], 'o')
+
+plt.show()
 
