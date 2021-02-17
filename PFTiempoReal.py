@@ -1,9 +1,10 @@
 import cv2
 import dlib
 from os import environ
-from scipy.spatial import Delaunay
+from Delaunay import Delaunay2D
 import numpy as np
-import matplotlib.pyplot as plt
+from scipy.spatial import Delaunay
+
 
 def suppress_qt_warnings():
     environ["QT_DEVICE_PIXEL_RATIO"] = "0"
@@ -14,60 +15,63 @@ def suppress_qt_warnings():
 if __name__ == "__main__":
     suppress_qt_warnings()
 
-
-
 pointsX = []
 pointsY = []
+
+def llenarArray(X, Y):
+    tam = len(X)
+    points = []
+    for i in range(0, tam):
+        points.append([X[i], Y[i]])
+    seeds = np.array(points)
+    return seeds
+
+def triangulacionPuntos(X, Y):
+    seeds = llenarArray(X, Y)
+    triangulacion = Delaunay(seeds)
+    return triangulacion
+
 
 detector = dlib.get_frontal_face_detector() #Carga el detector
 
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat") #Carga el predictor (predice)
 
-img = cv2.imread("face.jpg") #Lee la imagen
+cap = cv2.VideoCapture(0)
 
-gray = cv2.cvtColor(src=img, code=cv2.COLOR_BGR2GRAY) #Convierte la imagen en escala de grises
+while True:
+    _,frame = cap.read()
 
-faces = detector(gray) #Usa el detector para encontrar puntos de referencia
+    gray = cv2.cvtColor(src=frame, code=cv2.COLOR_BGR2GRAY)
 
-for face in faces:
-    x1 = face.left() #Punto izquierdo
-    y1 = face.top() #Punto superior
-    x2 = face.right() #Punto derecho
-    y2 = face.bottom() #Punto de botón
-    # cv2.rectangle(img=img, pt1=(x1, y1), pt2=(x2, y2), color=(0, 255, 0), thickness=4) # Dibuja el rectangulo
-    # Busca los puntos de referencia
-    landmarks = predictor(image=gray, box=face)
-    for n in range(0, 68):
-        x = landmarks.part(n).x
-        y = landmarks.part(n).y
-        #Dibuja el circulo
-        cv2.circle(img=img, center=(x, y), radius=2, color=(0, 255, 0), thickness=-1)
-        #Restaca los puntos(X y Y) de la cara
-        pointsX.append(x)
-        pointsY.append(y)
+    faces = detector(gray)
 
-print("Puntos X: ", pointsX)
-print("Puntos Y: ", pointsY)
+    for face in faces:
+        landmarks = predictor(image=gray, box=face)
+        triangulacion = []
+        pointsX = []
+        pointsY = []
+        for n in range(0, 68):
+            x = landmarks.part(n).x
+            y = landmarks.part(n).y
+            pointsX.append(x)
+            pointsY.append(y)
+            cv2.circle(img=frame, center=(x, y), radius=3, color=(0, 255, 0), thickness=-1)
 
-cv2.imshow(winname="Face", mat=img) #Muestra la imagen
+        triangulacion = triangulacionPuntos(pointsX, pointsY)
+        for m in range(0, len(triangulacion.simplices)):
+            # Obtiene las posiciones de los puntos para la triangulacion
+            a = triangulacion.simplices[m][0]
+            b = triangulacion.simplices[m][1]
+            c = triangulacion.simplices[m][2]
+            cv2.line(img=frame, pt1=(pointsX[a], pointsY[a]), pt2=(pointsX[b], pointsY[b]), color=(0, 255, 0))  # Trazo 1
+            cv2.line(img=frame, pt1=(pointsX[b], pointsY[b]), pt2=(pointsX[c], pointsY[c]), color=(0, 255, 0))  # Trazo 2
+            cv2.line(img=frame, pt1=(pointsX[c], pointsY[c]), pt2=(pointsX[a], pointsY[a]), color=(0, 255, 0))  # Trazo 3 (Cierre del triangulo)
 
-cv2.waitKey(delay=0) #Espera para salir
+        cv2.imshow(winname="Face", mat=frame)
 
-cv2.destroyAllWindows() #Cierra todas las ventanas
+        if cv2.waitKey(delay=1) == 27:
+            break
 
-#--------------------------------------------------------------------------------------------
-#--------------------------------------------------------------------------------------------
-#--------------------------------------------------------------------------------------------
-
-
-points = np.array([[0, 0], [0, 1.1], [1, 0], [1, 1]])
-
-
-tri = Delaunay(points)
-
-plt.triplot(points[:,0], points[:,1], tri.simplices)
-
-plt.plot(points[:,0], points[:,1], 'o')
-
-plt.show()
+cap.release()
+cv2.destroyAllWindows()
 

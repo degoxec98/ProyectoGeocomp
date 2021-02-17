@@ -43,7 +43,15 @@ class main:
         Y = self.pointsY
         for n in range(0, 68):
             # Dibuja el circulo
-            cv2.circle(img=img, center=(X[n], Y[n]), radius=2, color=(0, 255, 0), thickness=-1)
+            cv2.circle(img=img, center=(X[n], Y[n]), radius=3, color=(0, 255, 0), thickness=-1)
+        for m in range(0, len(self.triangulacion)):
+            # Obtiene las posiciones de los puntos para la triangulacion
+            a = self.triangulacion[m][0]
+            b = self.triangulacion[m][1]
+            c = self.triangulacion[m][2]
+            cv2.line(img=img, pt1=(X[a], Y[a]), pt2=(X[b], Y[b]), color=(0, 255, 0))  # Trazo 1
+            cv2.line(img=img, pt1=(X[b], Y[b]), pt2=(X[c], Y[c]), color=(0, 255, 0))  # Trazo 2
+            cv2.line(img=img, pt1=(X[c], Y[c]), pt2=(X[a], Y[a]), color=(0, 255, 0))  # Trazo 3 (Cierre del triangulo)
         cv2.imshow(winname="IMAGEN", mat=img)  # Muestra la imagen
         cv2.waitKey(delay=0)  # Espera para salir
         cv2.destroyAllWindows()  # Cierra todas las ventanas
