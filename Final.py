@@ -7,10 +7,7 @@ class InterfazAlgoSH():
     def __init__(self):
         self.raiz = Tk()
         self.myFrame = Frame(self.raiz, width="500", height="400")
-        self.entryP = Entry(self.myFrame, validate="key")
-        self.framePuntos = Frame(self.myFrame)
-        self.frameResultados = Frame(self.myFrame)
-        self.N = 0
+
 
     def foto(self):
         principal = iniciar()
