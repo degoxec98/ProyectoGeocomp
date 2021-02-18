@@ -1,77 +1,83 @@
 import cv2
 import dlib
 from os import environ
-from Delaunay import Delaunay2D
 import numpy as np
 from scipy.spatial import Delaunay
 
+class tiempoReal:
+    def suppress_qt_warnings(self):
+        environ["QT_DEVICE_PIXEL_RATIO"] = "0"
+        environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
+        environ["QT_SCREEN_SCALE_FACTORS"] = "1"
+        environ["QT_SCALE_FACTOR"] = "1"
 
-def suppress_qt_warnings():
-    environ["QT_DEVICE_PIXEL_RATIO"] = "0"
-    environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
-    environ["QT_SCREEN_SCALE_FACTORS"] = "1"
-    environ["QT_SCALE_FACTOR"] = "1"
+    if __name__ == "__main__":
+        suppress_qt_warnings()
 
-if __name__ == "__main__":
-    suppress_qt_warnings()
+    pointsX = []
+    pointsY = []
 
-pointsX = []
-pointsY = []
+    def llenarArray(self, X, Y):
+        tam = len(X)
+        points = []
+        for i in range(0, tam):
+            points.append([X[i], Y[i]])
+        seeds = np.array(points)
+        return seeds
 
-def llenarArray(X, Y):
-    tam = len(X)
-    points = []
-    for i in range(0, tam):
-        points.append([X[i], Y[i]])
-    seeds = np.array(points)
-    return seeds
+    def triangulacionPuntos(self, X, Y):
+        seeds = self.llenarArray(X, Y)
+        triangulacion = Delaunay(seeds)
+        return triangulacion
 
-def triangulacionPuntos(X, Y):
-    seeds = llenarArray(X, Y)
-    triangulacion = Delaunay(seeds)
-    return triangulacion
+    def algoritmo(self):
+        detector = dlib.get_frontal_face_detector() #Carga el detector
 
+        predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat") #Carga el predictor (predice)
 
-detector = dlib.get_frontal_face_detector() #Carga el detector
+        cap = cv2.VideoCapture(0)
+        flag = True
+        while flag:
+            _,frame = cap.read()
 
-predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat") #Carga el predictor (predice)
+            gray = cv2.cvtColor(src=frame, code=cv2.COLOR_BGR2GRAY)
 
-cap = cv2.VideoCapture(0)
+            faces = detector(gray)
 
-while True:
-    _,frame = cap.read()
+            for face in faces:
+                landmarks = predictor(image=gray, box=face)
+                triangulacion = []
+                pointsX = []
+                pointsY = []
+                for n in range(0, 68):
+                    x = landmarks.part(n).x
+                    y = landmarks.part(n).y
+                    pointsX.append(x)
+                    pointsY.append(y)
+                    cv2.circle(img=frame, center=(x, y), radius=3, color=(0, 255, 0), thickness=-1)
 
-    gray = cv2.cvtColor(src=frame, code=cv2.COLOR_BGR2GRAY)
+                triangulacion = self.triangulacionPuntos(pointsX, pointsY)
+                for m in range(0, len(triangulacion.simplices)):
+                    # Obtiene las posiciones de los puntos para la triangulacion
+                    a = triangulacion.simplices[m][0]
+                    b = triangulacion.simplices[m][1]
+                    c = triangulacion.simplices[m][2]
+                    cv2.line(img=frame, pt1=(pointsX[a], pointsY[a]), pt2=(pointsX[b], pointsY[b]), color=(0, 255, 0))  # Trazo 1
+                    cv2.line(img=frame, pt1=(pointsX[b], pointsY[b]), pt2=(pointsX[c], pointsY[c]), color=(0, 255, 0))  # Trazo 2
+                    cv2.line(img=frame, pt1=(pointsX[c], pointsY[c]), pt2=(pointsX[a], pointsY[a]), color=(0, 255, 0))  # Trazo 3 (Cierre del triangulo)
 
-    faces = detector(gray)
+                cv2.imshow(winname="Face", mat=frame)
 
-    for face in faces:
-        landmarks = predictor(image=gray, box=face)
-        triangulacion = []
-        pointsX = []
-        pointsY = []
-        for n in range(0, 68):
-            x = landmarks.part(n).x
-            y = landmarks.part(n).y
-            pointsX.append(x)
-            pointsY.append(y)
-            cv2.circle(img=frame, center=(x, y), radius=3, color=(0, 255, 0), thickness=-1)
+                if cv2.waitKey(delay=1) == 27 or cv2.waitKey(delay=1) == 30:
+                    print("Entrooo")
+                    flag = False
+                    break
 
-        triangulacion = triangulacionPuntos(pointsX, pointsY)
-        for m in range(0, len(triangulacion.simplices)):
-            # Obtiene las posiciones de los puntos para la triangulacion
-            a = triangulacion.simplices[m][0]
-            b = triangulacion.simplices[m][1]
-            c = triangulacion.simplices[m][2]
-            cv2.line(img=frame, pt1=(pointsX[a], pointsY[a]), pt2=(pointsX[b], pointsY[b]), color=(0, 255, 0))  # Trazo 1
-            cv2.line(img=frame, pt1=(pointsX[b], pointsY[b]), pt2=(pointsX[c], pointsY[c]), color=(0, 255, 0))  # Trazo 2
-            cv2.line(img=frame, pt1=(pointsX[c], pointsY[c]), pt2=(pointsX[a], pointsY[a]), color=(0, 255, 0))  # Trazo 3 (Cierre del triangulo)
+        cap.release()
+        cv2.destroyAllWindows()
 
-        cv2.imshow(winname="Face", mat=frame)
+class iniciar2():
 
-        if cv2.waitKey(delay=1) == 27:
-            break
-
-cap.release()
-cv2.destroyAllWindows()
-
+    def ejecutar(self):
+        tr = tiempoReal()
+        tr.algoritmo()

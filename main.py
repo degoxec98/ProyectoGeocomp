@@ -61,7 +61,8 @@ class main:
         self.triangulacionPuntos() #Obtiene la triangulacion de acuerdo a los puntos obtenidos
         self.mostrar() #Muestra en pantalla los resultados obtenidos
 
-if __name__ == '__main__':
-    img = "face.jpg"
-    principal = main(img)
-    principal.unir()
+class iniciar:
+    def ejecutar(self):
+        img = "face.jpg"
+        principal = main(img)
+        principal.unir()
