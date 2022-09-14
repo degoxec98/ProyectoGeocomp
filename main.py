@@ -63,6 +63,6 @@ class main:
 
 class iniciar:
     def ejecutar(self):
-        img = "face.jpg"
+        img = "img/face.jpg"
         principal = main(img)
         principal.unir()

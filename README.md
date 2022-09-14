@@ -1,5 +1,3 @@
-# ProyectoGeocomp
-Repositorio para el proyecto de Geocomp (Delaunay)
-nuevo
-probando
-que fue ?
+# Proyecto de Geometría Computacional
+
+Construcción de Triangulación de Delaunay a partir de puntos faciales.

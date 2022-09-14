@@ -1,4 +1,4 @@
-from tkinter import *
+from tkinter import Tk, Frame, Label, Button
 from main import iniciar
 from PFTiempoReal import iniciar2
 
